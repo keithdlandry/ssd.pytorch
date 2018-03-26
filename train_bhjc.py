@@ -84,6 +84,8 @@ if args.visdom:
     viz = visdom.Visdom()
 
 ssd_net = build_ssd('train', 300, num_classes, args.square_boxes)  # use the configuration for the SSD300 network
+ssd_net = build_ssd('train', 'trunc', num_classes, args.square_boxes)  # use the configuration for the SSD300 network
+
 net = ssd_net
 
 if args.cuda:

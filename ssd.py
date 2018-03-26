@@ -78,15 +78,15 @@ class SSD(nn.Module):
         sources.append(norm_output_conv4_3)
 
         # apply vgg up to fc7
-        # for k in range(23, len(self.vgg)):
-        #     x = self.vgg[k](x)
-        # sources.append(x)
-        #
-        # # apply extra layers and cache source layer outputs
-        # for k, v in enumerate(self.extras):
-        #     x = F.relu(v(x), inplace=True)
-        #     if k % 2 == 1:
-        #         sources.append(x)
+        for k in range(23, len(self.vgg)):
+            x = self.vgg[k](x)
+        sources.append(x)
+
+        # apply extra layers and cache source layer outputs
+        for k, v in enumerate(self.extras):
+            x = F.relu(v(x), inplace=True)
+            if k % 2 == 1:
+                sources.append(x)
 
         # apply multibox head to source layers
         for (x, l, c) in zip(sources, self.loc, self.conf):
@@ -194,13 +194,15 @@ def multibox(vgg, extra_layers, cfg, num_classes):
 base = {
     '300': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'C', 512, 512, 512, 'M', 512, 512, 512],
     '512': [],
-    '1166': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'C', 512, 512, 512, 'M', 512, 512, 512]
+    '1166': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'C', 512, 512, 512, 'M', 512, 512, 512],
+    'trunc': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'C', 512, 512, 512]
 }
 extras = {
     '300': [256, 'S', 512, 128, 'S', 256, 128, 256, 128, 256],
     '512': [],
     # extra layers added to bring feature maps to 38, 19, 10, 5, 3, 1
-    '1166': [256, 'S', 512, 128, 'S', 256, 256, 'S', 512, 128, 'S', 256, 128, 256, 128, 256]
+    '1166': [256, 'S', 512, 128, 'S', 256, 256, 'S', 512, 128, 'S', 256, 128, 256, 128, 256],
+    'trunc': []
 }
 mbox = {
     # number of boxes per feature map location default for 300
@@ -208,7 +210,8 @@ mbox = {
     '300': [4, 6, 6, 6, 4, 4],
     # '300': [2, 2, 2, 2, 2, 2],  # only square boxes
     '512': [],
-    '1166': [4, 6, 6, 6, 4, 4]
+    '1166': [4, 6, 6, 6, 4, 4],
+    'trunc': [4]
 }
 
 
