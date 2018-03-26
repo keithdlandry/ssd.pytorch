@@ -78,15 +78,15 @@ class SSD(nn.Module):
         sources.append(norm_output_conv4_3)
 
         # apply vgg up to fc7
-        for k in range(23, len(self.vgg)):
-            x = self.vgg[k](x)
-        sources.append(x)
-
-        # apply extra layers and cache source layer outputs
-        for k, v in enumerate(self.extras):
-            x = F.relu(v(x), inplace=True)
-            if k % 2 == 1:
-                sources.append(x)
+        # for k in range(23, len(self.vgg)):
+        #     x = self.vgg[k](x)
+        # sources.append(x)
+        #
+        # # apply extra layers and cache source layer outputs
+        # for k, v in enumerate(self.extras):
+        #     x = F.relu(v(x), inplace=True)
+        #     if k % 2 == 1:
+        #         sources.append(x)
 
         # apply multibox head to source layers
         for (x, l, c) in zip(sources, self.loc, self.conf):
