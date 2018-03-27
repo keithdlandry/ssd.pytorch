@@ -62,8 +62,7 @@ else:
 if not os.path.exists(args.save_folder):
     os.mkdir(args.save_folder)
 
-# train_sets = 'train'
-network_name = 'trunc'
+network_name = '300'
 ssd_dim = 1166  # dimension of small side of image
 means = (104, 117, 123)  # only support voc now
 # means = (103, 100, 94)  # RGB mean values for bhjc 700 image set
@@ -158,7 +157,8 @@ def train():
 
     dataset = BhjcBballDataset(args.anno_dir, args.img_dir, train_image_ids,
                                SSDAugmentation(ssd_dim, means),
-                               AnnotationTransformBhjc(ball_only=args.ball_only, class_to_ind=class_dict))
+                               AnnotationTransformBhjc(ball_only=args.ball_only,
+                                                       class_to_ind=class_dict))
 
     epoch_size = len(dataset) // args.batch_size
     print('Training SSD on', dataset.name)
@@ -256,13 +256,16 @@ def train():
                 )
         if iteration % 1000 == 0:
             print('Saving state, iter:', iteration)
-            torch.save(ssd_net.state_dict(), 'weights/ssd1166_trunctated_iter' +
+            torch.save(ssd_net.state_dict(), 'weights/ssd1166_{}_iter'.format(network_name) +
                        repr(iteration) + '.pth')
 
     time_stamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     unique_id = '_{}'.format(time_stamp)
 
-    torch.save(ssd_net.state_dict(), args.save_folder + 'ssd1166_trunctated_final_' + args.version + unique_id + '.pth')
+    torch.save(
+        ssd_net.state_dict(),
+        args.save_folder + 'ssd1166_{}_final_'.format(network_name) + args.version +
+        unique_id + '.pth')
 
 
 def adjust_learning_rate(optimizer, gamma, step):
