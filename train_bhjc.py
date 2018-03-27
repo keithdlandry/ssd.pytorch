@@ -7,14 +7,15 @@ import torch.nn.init as init
 import argparse
 from torch.autograd import Variable
 import torch.utils.data as data
-from data import v2, v1, detection_collate
-from data.bhjc20180123_bball.bhjc import BhjcBballDataset, AnnotationTransformBhjc, CLASSES
+from data import v2, v1, detection_collate, bhjc_trunc_cfg
+from data.bhjc20180123_bball.bhjc import BhjcBballDataset, AnnotationTransformBhjc
 from utils.augmentations import SSDAugmentation
 from layers.modules import MultiBoxLoss
 from ssd import build_ssd
 import numpy as np
 import time
 import datetime
+from master_config import configs
 
 
 def str2bool(v):
@@ -42,9 +43,9 @@ parser.add_argument('--save_folder', default='weights/', help='Location to save 
 parser.add_argument('--anno_dir', default='/Users/keith.landry/data/internal-experiments/basketball/bhjc/20180123/images/left_cam/')
 parser.add_argument('--img_dir', default='/Users/keith.landry/data/internal-experiments/basketball/bhjc/20180123/labels/left_cam/')
 # parser.add_argument('--id_file', default='/Users/keith.landry/code/ssd.pytorch/data/bhjc20180123_bball/bhjc_trainval.txt')
-# parser.add_argument('--id_file', default='/Users/keith.landry/code/ssd.pytorch/data/bhjc20180123_bball/bhjc_trainonly.txt')
+parser.add_argument('--id_file', default='/Users/keith.landry/code/ssd.pytorch/data/bhjc20180123_bball/bhjc_trainonly.txt')
 # parser.add_argument('--id_file', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/bhjc_trainval.txt')
-parser.add_argument('--id_file', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/bhjc_trainonly.txt')
+# parser.add_argument('--id_file', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/bhjc_trainonly.txt')
 parser.add_argument('--ball_only', default=True, type=str2bool)
 parser.add_argument('--square_boxes', default=False, type=str2bool)
 
@@ -55,20 +56,28 @@ if args.cuda and torch.cuda.is_available():
 else:
     torch.set_default_tensor_type('torch.FloatTensor')
 
-cfg = (v1, v2)[args.version == 'v2']
+# cfg = (v1, v2)[args.version == 'v2']
+cfg = bhjc_trunc_cfg
 
 if not os.path.exists(args.save_folder):
     os.mkdir(args.save_folder)
 
 # train_sets = 'train'
-if args.ball_only:
-    CLASSES = ['basketball']
-
+network_name = 'trunc'
 ssd_dim = 1166  # dimension of small side of image
 means = (104, 117, 123)  # only support voc now
 # means = (103, 100, 94)  # RGB mean values for bhjc 700 image set
 std_devs = (71.1, 69.2, 67.3)
-num_classes = len(CLASSES) + 1
+
+if args.ball_only:
+    class_dict = configs['classes']['ball_only']
+else:
+    class_dict = configs['classes']['all_class']
+
+if args.square_boxes:
+    configs[network_name]['box_configs']['square_only'] = True
+
+num_classes = len(class_dict) + 1
 batch_size = args.batch_size
 accum_batch_size = 32
 iter_size = accum_batch_size / batch_size
@@ -83,26 +92,10 @@ if args.visdom:
     import visdom
     viz = visdom.Visdom()
 
-ssd_net = build_ssd('train', 300, num_classes, args.square_boxes)  # use the configuration for the SSD300 network
-ssd_net = build_ssd('train', 'trunc', num_classes, args.square_boxes)  # use the configuration for the SSD300 network
+ssd_net = build_ssd('train', configs, network_name, num_classes, args.square_boxes)  # use the configuration for the SSD300 network
+
 
 net = ssd_net
-
-if args.cuda:
-    net = torch.nn.DataParallel(ssd_net)  # this fixed something
-    cudnn.benchmark = True
-
-if args.resume:
-    print('Resuming training, loading {}...'.format(args.resume))
-    ssd_net.load_weights(args.resume)
-else:
-    vgg_weights = torch.load(args.save_folder + args.basenet)
-    print('Loading base network...')
-    ssd_net.vgg.load_state_dict(vgg_weights)
-
-if args.cuda:
-    net = net.cuda()
-
 
 def xavier(param):
     init.xavier_uniform(param)
@@ -113,6 +106,22 @@ def weights_init(m):
         xavier(m.weight.data)
         m.bias.data.zero_()
 
+if args.cuda:
+    net = torch.nn.DataParallel(ssd_net)  # this fixed something
+    cudnn.benchmark = True
+
+if args.resume:
+    print('Resuming training, loading {}...'.format(args.resume))
+    ssd_net.load_weights(args.resume)
+elif network_name == 'trunc':
+    ssd_net.vgg.apply(weights_init)
+else:
+    vgg_weights = torch.load(args.save_folder + args.basenet)
+    print('Loading base network...')
+    ssd_net.vgg.load_state_dict(vgg_weights)
+
+if args.cuda:
+    net = net.cuda()
 
 if not args.resume:
     print('Initializing weights...')
@@ -120,6 +129,7 @@ if not args.resume:
     ssd_net.extras.apply(weights_init)
     ssd_net.loc.apply(weights_init)
     ssd_net.conf.apply(weights_init)
+
 
 optimizer = optim.SGD(net.parameters(), lr=args.lr,
                       momentum=args.momentum, weight_decay=args.weight_decay)
@@ -148,7 +158,7 @@ def train():
 
     dataset = BhjcBballDataset(args.anno_dir, args.img_dir, train_image_ids,
                                SSDAugmentation(ssd_dim, means),
-                               AnnotationTransformBhjc(ball_only=args.ball_only))
+                               AnnotationTransformBhjc(ball_only=args.ball_only, class_to_ind=class_dict))
 
     epoch_size = len(dataset) // args.batch_size
     print('Training SSD on', dataset.name)

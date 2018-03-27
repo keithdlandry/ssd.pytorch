@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 from layers import *
-from data import v2, bhjc_cfg
 import os
 
 
@@ -24,15 +23,16 @@ class SSD(nn.Module):
         head: "multibox head" consists of loc and conf conv layers
     """
 
-    def __init__(self, phase, base, extras, head, num_classes):
+    def __init__(self, phase, base, extras, head, num_classes, configs, network_name):
         super(SSD, self).__init__()
         self.phase = phase
         self.num_classes = num_classes
         # TODO: implement __call__ in PriorBox
-        self.priorbox = PriorBox(v2)
+        box_configs = configs[network_name]['box_configs']
+        self.priorbox = PriorBox(box_configs)
         self.priors = Variable(self.priorbox.forward(), volatile=True)
-        self.size = 300
-        self.config = v2
+        self.size = 300  # don't think this is used
+        self.config = box_configs
 
         # SSD network
         self.vgg = nn.ModuleList(base)
@@ -131,7 +131,7 @@ class SSD(nn.Module):
 
 # This function is derived from torchvision VGG make_layers()
 # https://github.com/pytorch/vision/blob/master/torchvision/models/vgg.py
-def vgg(cfg, i, batch_norm=False):
+def vgg(cfg, i, layers5_7, batch_norm=False):
     layers = []
     in_channels = i
     for v in cfg:
@@ -146,11 +146,12 @@ def vgg(cfg, i, batch_norm=False):
             else:
                 layers += [conv2d, nn.ReLU(inplace=True)]
             in_channels = v
-    pool5 = nn.MaxPool2d(kernel_size=3, stride=1, padding=1)
-    conv6 = nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6)
-    conv7 = nn.Conv2d(1024, 1024, kernel_size=1)
-    layers += [pool5, conv6,
-               nn.ReLU(inplace=True), conv7, nn.ReLU(inplace=True)]
+    if layers5_7:
+        pool5 = nn.MaxPool2d(kernel_size=3, stride=1, padding=1)
+        conv6 = nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6)
+        conv7 = nn.Conv2d(1024, 1024, kernel_size=1)
+        layers += [pool5, conv6,
+                   nn.ReLU(inplace=True), conv7, nn.ReLU(inplace=True)]
     return layers
 
 
@@ -171,14 +172,17 @@ def add_extras(cfg, i, batch_norm=False):
     return layers
 
 
-def multibox(vgg, extra_layers, cfg, num_classes):
+def multibox(vgg, extra_layers, cfg, num_classes, vgg_source=[21, -2]):
     loc_layers = []
     conf_layers = []
+    print('vgg source', vgg_source)
 
     # Not sure why he uses 21 here when the actual source comes from 23 (end of 4_3 rather than mid)
-    # but it should give the same size.
-    vgg_source = [21, -2]
+    # but it should give the same size. -- It's because ReLU has no out channels
+    # vgg_source = [21, -2]  # full base network
+    # vgg_source = [-2]  # trunctated
     for k, v in enumerate(vgg_source):
+        print(vgg[v].out_channels)
         loc_layers += [nn.Conv2d(vgg[v].out_channels,
                                  cfg[k] * 4, kernel_size=3, padding=1, stride=1)]  # changed from s1 to s2 when using half number of prior boxes
         conf_layers += [nn.Conv2d(vgg[v].out_channels,
@@ -190,43 +194,52 @@ def multibox(vgg, extra_layers, cfg, num_classes):
                                   * num_classes, kernel_size=3, padding=1, stride=1)]  # changed from s1 to s2...
     return vgg, extra_layers, (loc_layers, conf_layers)
 
+#
+# base = {
+#     '300': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'C', 512, 512, 512, 'M', 512, 512, 512],
+#     '512': [],
+#     '1166': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'C', 512, 512, 512, 'M', 512, 512, 512],
+#     'trunc': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'C', 512, 512, 512]
+# }
+# extras = {
+#     '300': [256, 'S', 512, 128, 'S', 256, 128, 256, 128, 256],
+#     '512': [],
+#     # extra layers added to bring feature maps to 38, 19, 10, 5, 3, 1
+#     '1166': [256, 'S', 512, 128, 'S', 256, 256, 'S', 512, 128, 'S', 256, 128, 256, 128, 256],
+#     'trunc': []
+# }
+# mbox = {
+#     # number of boxes per feature map location default for 300
+#     # needs to be the same at 2 + 2*len(aspect ratios) in config.py
+#     '300': [4, 6, 6, 6, 4, 4],
+#     # '300': [2, 2, 2, 2, 2, 2],  # only square boxes
+#     '512': [],
+#     '1166': [4, 6, 6, 6, 4, 4],
+#     'trunc': [4]
+# }
 
-base = {
-    '300': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'C', 512, 512, 512, 'M', 512, 512, 512],
-    '512': [],
-    '1166': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'C', 512, 512, 512, 'M', 512, 512, 512],
-    'trunc': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'C', 512, 512, 512]
-}
-extras = {
-    '300': [256, 'S', 512, 128, 'S', 256, 128, 256, 128, 256],
-    '512': [],
-    # extra layers added to bring feature maps to 38, 19, 10, 5, 3, 1
-    '1166': [256, 'S', 512, 128, 'S', 256, 256, 'S', 512, 128, 'S', 256, 128, 256, 128, 256],
-    'trunc': []
-}
-mbox = {
-    # number of boxes per feature map location default for 300
-    # needs to be the same at 2 + 2*len(aspect ratios) in config.py
-    '300': [4, 6, 6, 6, 4, 4],
-    # '300': [2, 2, 2, 2, 2, 2],  # only square boxes
-    '512': [],
-    '1166': [4, 6, 6, 6, 4, 4],
-    'trunc': [4]
-}
 
-
-def build_ssd(phase, size=300, num_classes=21, square_boxes=False):
+def build_ssd(phase, configs, network_name='300', num_classes=21, square_boxes=False):
     if phase != "test" and phase != "train":
         print("Error: Phase not recognized")
         return
-    if size != 300:
-        print("Error: Sorry only SSD300 is supported currently!")
-        return
+    # if size != 300:
+    #     print("Error: Sorry only SSD300 is supported currently!")
+    #     return
     print('number of classes =', num_classes)
+
+    base = configs[network_name]['base']
+    extras = configs[network_name]['extras']
+    mbox = configs[network_name]['mbox']
+    size_last_base_layer = configs[network_name]['final_base_layer_dim']
+    final_vgg_layers = configs[network_name]['layers5to7']
+
     if square_boxes:
-        mbox[str(size)] = [2]*len(mbox[str(size)])
-        print(mbox[str(size)])
-    base_, extras_, head_ = multibox(vgg(base[str(size)], 3),
-                                     add_extras(extras[str(size)], 1024),  # 3 and 1024 are input channels
-                                     mbox[str(size)], num_classes)
-    return SSD(phase, base_, extras_, head_, num_classes)
+        mbox = [2]*len(mbox)
+        print(mbox)
+
+    base_, extras_, head_ = multibox(vgg(base, 3, layers5_7=final_vgg_layers),
+                                     add_extras(extras, size_last_base_layer),  # 3 and 1024 are input channels
+                                     mbox, num_classes,
+                                     configs[network_name]['vgg_source'])
+    return SSD(phase, base_, extras_, head_, num_classes, configs, network_name)

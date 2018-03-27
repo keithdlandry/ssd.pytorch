@@ -19,7 +19,7 @@ else:
 
 # GLOBALS
 # CLASSES = ('person', 'basketball')
-CLASSES = ['basketball']
+# CLASSES = ['basketball']
 # for making bounding boxes pretty
 COLORS = ((255, 0, 0, 128), (0, 255, 0, 128), (0, 0, 255, 128),
           (0, 255, 255, 128), (255, 0, 255, 128), (255, 255, 0, 128))
@@ -39,6 +39,7 @@ class AnnotationTransformBhjc(object):
     """
 
     def __init__(self, class_to_ind=None, keep_difficult=False, ball_only=False):
+
         self.class_to_ind = class_to_ind or dict(
             zip(CLASSES, range(len(CLASSES))))
         self.keep_difficult = keep_difficult
@@ -100,7 +101,6 @@ class BhjcBballDataset(data.Dataset):
         dataset_name (string, optional): name of the dataset
             (default: 'bhjc')
     """
-    #TODO: read image files from s3
     def __init__(self, img_path, anno_path, id_list, transform=None,
                  target_transform=None, dataset_name='bhjc', file_name_prfx='left_scene2_rot180_'):
         self.img_path = img_path
