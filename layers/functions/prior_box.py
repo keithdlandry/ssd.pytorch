@@ -34,6 +34,7 @@ class PriorBox(object):
                 raise ValueError('Variances must be greater than 0')
 
     def forward(self):
+        print(self.feature_maps)
         mean = []
         # TODO merge these
         if self.version == 'v2' or self.version == 'bhjc':
@@ -55,8 +56,9 @@ class PriorBox(object):
                     s_k_prime = sqrt(s_k * (self.max_sizes[k]/self.image_size))
                     mean += [cx, cy, s_k_prime, s_k_prime]
 
+                    square_only = self.square_only
                     # rest of aspect ratios
-                    if not self.square_only:
+                    if not square_only:
                         for ar in self.aspect_ratios[k]:
                             mean += [cx, cy, s_k*sqrt(ar), s_k/sqrt(ar)]
                             mean += [cx, cy, s_k/sqrt(ar), s_k*sqrt(ar)]
@@ -92,5 +94,5 @@ class PriorBox(object):
         output = torch.Tensor(mean).view(-1, 4)
         if self.clip:
             output.clamp_(max=1, min=0)
-        # print(output)
+        print('number of prior boxes:', len(mean)/4)
         return output

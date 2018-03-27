@@ -13,9 +13,8 @@ from ssd import build_ssd
 import boto3
 import tempfile
 # from data import VOC_CLASSES as labels
-from data.bhjc20180123_bball.bhjc import CLASSES as labels
 from matplotlib import pyplot as plt
-
+from master_config import configs
 
 def get_img_targ_from_s3(img_id, s3_bucket='geniussports-computer-vision-data',
                          s3_path='internal-experiments/basketball/bhjc/20180123/',
@@ -37,7 +36,11 @@ def get_img_targ_from_s3(img_id, s3_bucket='geniussports-computer-vision-data',
     return img
 
 
-net = build_ssd('test', 300, 2, square_boxes=True)    # initialize SSD 21 classes (num classes + 1)
+network_name = '300'
+
+labels = list(configs['classes']['ball_only'].keys())
+net = build_ssd('test', configs, '300', 2, square_boxes=True)  # use the configuration for the SSD300 network (hold on this was set to train?)
+
 # weight_file = 'weights/ssd1166_bhjctrained_iter5000_smallLR.pth'
 weight_file = 'weights/ssd1166_bhjctrained_iter104000_ballonlysquare.pth'
 net.load_weights(weight_file)

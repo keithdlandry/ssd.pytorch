@@ -31,7 +31,7 @@ class SSD(nn.Module):
         box_configs = configs[network_name]['box_configs']
         self.priorbox = PriorBox(box_configs)
         self.priors = Variable(self.priorbox.forward(), volatile=True)
-        self.size = 300  # don't think this is used
+        self.size = 1166  # don't think this is used
         self.config = box_configs
 
         # SSD network
@@ -88,6 +88,7 @@ class SSD(nn.Module):
             if k % 2 == 1:
                 sources.append(x)
 
+        print('total sources', len(sources))
         # apply multibox head to source layers
         for (x, l, c) in zip(sources, self.loc, self.conf):
             loc.append(l(x).permute(0, 2, 3, 1).contiguous())
@@ -175,14 +176,14 @@ def add_extras(cfg, i, batch_norm=False):
 def multibox(vgg, extra_layers, cfg, num_classes, vgg_source=[21, -2]):
     loc_layers = []
     conf_layers = []
-    print('vgg source', vgg_source)
+    print('vgg source:', vgg_source)
 
     # Not sure why he uses 21 here when the actual source comes from 23 (end of 4_3 rather than mid)
     # but it should give the same size. -- It's because ReLU has no out channels
     # vgg_source = [21, -2]  # full base network
     # vgg_source = [-2]  # trunctated
     for k, v in enumerate(vgg_source):
-        print(vgg[v].out_channels)
+        print('vgg source output channels', vgg[v].out_channels)
         loc_layers += [nn.Conv2d(vgg[v].out_channels,
                                  cfg[k] * 4, kernel_size=3, padding=1, stride=1)]  # changed from s1 to s2 when using half number of prior boxes
         conf_layers += [nn.Conv2d(vgg[v].out_channels,
@@ -192,6 +193,8 @@ def multibox(vgg, extra_layers, cfg, num_classes, vgg_source=[21, -2]):
                                  * 4, kernel_size=3, padding=1, stride=1)]  # changed from s1 to s2...
         conf_layers += [nn.Conv2d(v.out_channels, cfg[k]
                                   * num_classes, kernel_size=3, padding=1, stride=1)]  # changed from s1 to s2...
+
+    print('number of extra layers (each is really 2):', len(extra_layers))
     return vgg, extra_layers, (loc_layers, conf_layers)
 
 #
@@ -233,10 +236,12 @@ def build_ssd(phase, configs, network_name='300', num_classes=21, square_boxes=F
     mbox = configs[network_name]['mbox']
     size_last_base_layer = configs[network_name]['final_base_layer_dim']
     final_vgg_layers = configs[network_name]['layers5to7']
+    if square_boxes:
+        configs[network_name]['box_configs']['square_only'] = True
 
     if square_boxes:
         mbox = [2]*len(mbox)
-        print(mbox)
+        print('number of boxes per position for each source layer:', mbox)
 
     base_, extras_, head_ = multibox(vgg(base, 3, layers5_7=final_vgg_layers),
                                      add_extras(extras, size_last_base_layer),  # 3 and 1024 are input channels
