@@ -7,7 +7,7 @@ import torch.nn.init as init
 import argparse
 from torch.autograd import Variable
 import torch.utils.data as data
-from data import v2, v1, detection_collate, bhjc_trunc_cfg
+from data import v2, v1, detection_collate
 from data.bhjc20180123_bball.bhjc import BhjcBballDataset, AnnotationTransformBhjc
 from utils.augmentations import SSDAugmentation
 from layers.modules import MultiBoxLoss
