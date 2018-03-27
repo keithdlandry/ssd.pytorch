@@ -57,7 +57,7 @@ else:
     torch.set_default_tensor_type('torch.FloatTensor')
 
 # cfg = (v1, v2)[args.version == 'v2']
-cfg = bhjc_trunc_cfg
+# cfg = bhjc_trunc_cfg
 
 if not os.path.exists(args.save_folder):
     os.mkdir(args.save_folder)
