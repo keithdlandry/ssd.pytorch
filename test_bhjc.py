@@ -45,6 +45,8 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
     else:
         labelmap = ('person', 'basketball')
 
+    predictions = []
+
     # dump predictions and assoc. ground truth to text file for now
     filename = save_folder+'bbox_predictions_{}.json'.format(net_name)
     num_images = len(testset)
@@ -69,8 +71,6 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
         scale = torch.Tensor([img.shape[1], img.shape[0],
                              img.shape[1], img.shape[0]])
 
-        predictions = []
-
         for i in range(detections.size(1)):
             j = 0
             while detections[0, i, j, 0] >= args.visual_threshold:
@@ -80,7 +80,9 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
                 score = detections[0, i, j, 0]
                 label_name = labelmap[i-1]
                 pt = (detections[0, i, j, 1:]*scale).cpu().numpy()
-
+                # convert to width and height as is the COCO standard
+                pt[2] = pt[2] - pt[0]
+                pt[3] = pt[3] - pt[1]
                 # use coco label ids:
                 if label_name == 'person':
                     label_id = 1
@@ -130,7 +132,7 @@ if __name__ == '__main__':
         test_image_ids = f.readlines()
         test_image_ids = [im_id.rstrip() for im_id in test_image_ids]
 
-    test_image_ids = ['00700']
+    test_image_ids = ['00700', '00701']
 
     test_set = BhjcBballDataset(
         'annopath', 'imgpath', test_image_ids, None,
