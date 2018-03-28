@@ -150,16 +150,16 @@ class BhjcBballDataset(data.Dataset):
     def pull_item(self, index):
         img_id = self.ids[index]
 
-        # anno_file = self._annopath + self.file_name_prfx + img_id + '.xml'
-        # img_file = self._imgpath + self.file_name_prfx + img_id + '.png'
+        anno_file = self._annopath + self.file_name_prfx + img_id + '.xml'
+        img_file = self._imgpath + self.file_name_prfx + img_id + '.png'
 
-        # print(anno_file)
-        # print(img_file)
+        print(anno_file)
+        print(img_file)
 
-        # target = ET.parse(anno_file).getroot()
-        # img = cv2.imread(img_file)
+        target = ET.parse(anno_file).getroot()
+        img = cv2.imread(img_file)
 
-        img, target = self.get_img_targ_from_s3(img_id)
+        # img, target = self.get_img_targ_from_s3(img_id)
 
         height, width, channels = img.shape
 

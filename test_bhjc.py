@@ -23,7 +23,7 @@ def str2bool(v):
 parser = argparse.ArgumentParser(description='Single Shot MultiBox Detection')
 # parser.add_argument('--trained_model', default='weights/ssd1166_bhjctrained_iter104000_ballonlysquare.pth',
 #                     type=str, help='Trained state_dict file path to open')
-parser.add_argument('--trained_model', default='weights/ssd1166_300_iter77000.pth',
+parser.add_argument('--trained_model', default='weights/ssd1166_300_iter90000.pth',
                     type=str, help='Trained state_dict file path to open')
 parser.add_argument('--save_folder', default='eval/', type=str,
                     help='Dir to save results')
@@ -35,6 +35,9 @@ parser.add_argument('--cuda', default=False, type=bool,
 parser.add_argument('--id_file', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/bhjc_testonly.txt')
 parser.add_argument('--ball_only', default=True, type=str2bool)
 parser.add_argument('--square_boxes', default=True, type=str2bool)
+parser.add_argument('--anno_dir', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/annotations/')
+parser.add_argument('--img_dir', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/images/')
+
 args = parser.parse_args()
 
 if not os.path.exists(args.save_folder):
@@ -51,7 +54,7 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
     predictions = []
 
     # dump predictions and assoc. ground truth to text file for now
-    filename = save_folder+'bbox_predictions_{}_77k_testsetonly_thresh.2.json'.format(net_name)
+    filename = save_folder+'bbox_predictions_{}_90k_testsetonly_thresh.2.json'.format(net_name)
     num_images = len(testset)
     for i in range(num_images):
         print('Testing image {:d}/{:d}....'.format(i+1, num_images))
@@ -134,7 +137,7 @@ if __name__ == '__main__':
     # test_image_ids = ['00700', '00701']
 
     test_set = BhjcBballDataset(
-        'annopath', 'imgpath', test_image_ids, None,
+        args.anno_dir, args.img_dir, test_image_ids, None,
         AnnotationTransformBhjc(ball_only=args.ball_only, class_to_ind=class_dict))
 
     if args.cuda:
