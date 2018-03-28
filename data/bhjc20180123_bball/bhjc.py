@@ -121,7 +121,8 @@ class BhjcBballDataset(data.Dataset):
         return len(self.ids)
 
     def get_img_targ_from_s3(self, img_id, s3_bucket='geniussports-computer-vision-data',
-                             s3_path='internal-experiments/basketball/bhjc/20180123/'):
+                             s3_path='internal-experiments/basketball/bhjc/20180123/',
+                             image_only=False):
 
         im_path = s3_path + 'images/left_cam/' + self.file_name_prfx + img_id + '.png'
         anno_path = s3_path + 'labels/' + self.file_name_prfx + img_id + '.xml'  # xml file has no left_cam directory
@@ -140,6 +141,9 @@ class BhjcBballDataset(data.Dataset):
         with open(tmp.name, 'wb') as f:
             im_obj.download_fileobj(f)
         img = cv2.imread(tmp.name)
+
+        if image_only:
+            return img
 
         with open(tmp.name, 'wb') as f:
             anno_obj.download_fileobj(f)
@@ -209,6 +213,22 @@ class BhjcBballDataset(data.Dataset):
         anno = ET.parse(self._annopath % img_id).getroot()
         gt = self.target_transform(anno, 1, 1)
         return img_id[1], gt
+
+    def pull_image(self, index):
+        '''Returns the original image object at index in PIL form
+
+        Note: not using self.__getitem__(), as any transformations passed in
+        could mess up this functionality.
+
+        Argument:
+            index (int): index of img to show
+        Return:
+            PIL img
+        '''
+        img_id = self.ids[index]
+        img = self.get_img_targ_from_s3(img_id, image_only=True)
+
+        return img_id, img
 
 
 
