@@ -21,7 +21,9 @@ def str2bool(v):
 
 
 parser = argparse.ArgumentParser(description='Single Shot MultiBox Detection')
-parser.add_argument('--trained_model', default='weights/ssd1166_bhjctrained_iter104000_ballonlysquare.pth',
+# parser.add_argument('--trained_model', default='weights/ssd1166_bhjctrained_iter104000_ballonlysquare.pth',
+#                     type=str, help='Trained state_dict file path to open')
+parser.add_argument('--trained_model', default='weights/ssd1166_300_iter77000.pth',
                     type=str, help='Trained state_dict file path to open')
 parser.add_argument('--save_folder', default='eval/', type=str,
                     help='Dir to save results')
@@ -49,7 +51,7 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
     predictions = []
 
     # dump predictions and assoc. ground truth to text file for now
-    filename = save_folder+'bbox_predictions_{}.json'.format(net_name)
+    filename = save_folder+'bbox_predictions_{}_77k_testsetonly.json'.format(net_name)
     num_images = len(testset)
     for i in range(num_images):
         print('Testing image {:d}/{:d}....'.format(i+1, num_images))
@@ -59,10 +61,6 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
         x = torch.from_numpy(transform(img)[0]).permute(2, 0, 1)
         x = Variable(x.unsqueeze(0))
 
-        # with open(filename, mode='a') as f:
-        #     f.write('\nGROUND TRUTH FOR: '+img_id+'\n')
-        #     for box in annotation:
-        #         f.write('label: '+' || '.join(str(b) for b in box)+'\n')
         if cuda:
             x = x.cuda()
 
@@ -133,7 +131,7 @@ if __name__ == '__main__':
         test_image_ids = f.readlines()
         test_image_ids = [im_id.rstrip() for im_id in test_image_ids]
 
-    test_image_ids = ['00700', '00701']
+    # test_image_ids = ['00700', '00701']
 
     test_set = BhjcBballDataset(
         'annopath', 'imgpath', test_image_ids, None,
