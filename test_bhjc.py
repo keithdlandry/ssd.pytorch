@@ -23,7 +23,7 @@ def str2bool(v):
 parser = argparse.ArgumentParser(description='Single Shot MultiBox Detection')
 # parser.add_argument('--trained_model', default='weights/ssd1166_bhjctrained_iter104000_ballonlysquare.pth',
 #                     type=str, help='Trained state_dict file path to open')
-parser.add_argument('--trained_model', default='weights/ssd1166_300_iter90000.pth',
+parser.add_argument('--trained_model', default='weights/ssd1166_300_iter76000.pth',
                     type=str, help='Trained state_dict file path to open')
 parser.add_argument('--save_folder', default='eval/', type=str,
                     help='Dir to save results')
@@ -54,7 +54,7 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
     predictions = []
 
     # dump predictions and assoc. ground truth to text file for now
-    filename = save_folder+'bbox_predictions_{}_90k_unannot_thresh.2.json'.format(net_name)
+    filename = save_folder+'bbox_predictions_{}_76k_unannot_thresh.2.json'.format(net_name)
     num_images = len(testset)
     for i in range(num_images):
         print('Testing image {:d}/{:d}....'.format(i+1, num_images))
