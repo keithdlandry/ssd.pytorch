@@ -51,7 +51,7 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
     predictions = []
 
     # dump predictions and assoc. ground truth to text file for now
-    filename = save_folder+'bbox_predictions_{}_77k_testsetonly.json'.format(net_name)
+    filename = save_folder+'bbox_predictions_{}_77k_testsetonly_thresh.2.json'.format(net_name)
     num_images = len(testset)
     for i in range(num_images):
         print('Testing image {:d}/{:d}....'.format(i+1, num_images))
