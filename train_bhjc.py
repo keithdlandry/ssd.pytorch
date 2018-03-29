@@ -169,7 +169,7 @@ def train():
     # print(train_image_ids)
     # return 0
 
-    dataset = BhjcBballDataset(args.anno_dir, args.img_dir, train_image_ids,
+    dataset = BhjcBballDataset(args.img_dir, args.anno_dir, train_image_ids,
                                SSDAugmentation(ssd_dim, means),
                                AnnotationTransformBhjc(ball_only=args.ball_only,
                                                        class_to_ind=class_dict))
