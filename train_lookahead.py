@@ -160,7 +160,7 @@ def train():
         train_image_ids = f.readlines()
     train_image_ids = [im_id.rstrip() for im_id in train_image_ids]
 
-    train_image_ids = ['00700']
+    # train_image_ids = ['00700']
     # train_image_ids = ['00196']
     # train_image_ids = ['00198', '00091']
     # print(train_image_ids)
