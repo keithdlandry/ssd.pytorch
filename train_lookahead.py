@@ -48,15 +48,13 @@ parser.add_argument(
     '--send_images_to_visdom', type=str2bool, default=False,
     help='Sample a random image from each 10th batch, send it to visdom after augmentations step')
 parser.add_argument('--save_folder', default='weights/', help='Location to save checkpoint models')
-parser.add_argument('--anno_dir', default='/Users/keith.landry/data/internal-experiments/basketball/bhjc/20180123/images/left_cam/')
-parser.add_argument('--img_dir', default='/Users/keith.landry/data/internal-experiments/basketball/bhjc/20180123/labels/left_cam/')
+# parser.add_argument('--anno_dir', default='/Users/keith.landry/data/internal-experiments/basketball/bhjc/20180123/images/left_cam/')
+# parser.add_argument('--img_dir', default='/Users/keith.landry/data/internal-experiments/basketball/bhjc/20180123/labels/left_cam/')
 # parser.add_argument('--id_file', default='/Users/keith.landry/code/ssd.pytorch/data/bhjc20180123_bball/bhjc_trainval.txt')
-parser.add_argument('--id_file', default='/Users/keith.landry/code/ssd.pytorch/data/bhjc20180123_bball/bhjc_trainonly.txt')
-# parser.add_argument('--id_file', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/bhjc_trainval.txt')
-# parser.add_argument(
-#     '--id_file',
-#     default='/home/ec2-user/computer_vision/bball_detection/'
-#             'ssd.pytorch/data/bhjc20180123_bball/bhjc_trainonly.txt')
+# parser.add_argument('--id_file', default='/Users/keith.landry/code/ssd.pytorch/data/bhjc20180123_bball/bhjc_trainonly.txt')
+parser.add_argument('--id_file', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/bhjc_trainonly.txt')
+parser.add_argument('--anno_dir', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/annotations/')
+parser.add_argument('--img_dir', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/images/')
 parser.add_argument('--ball_only', default=True, type=str2bool)
 parser.add_argument('--square_boxes', default=False, type=str2bool)
 parser.add_argument('--network_name', default='300', type=str)
