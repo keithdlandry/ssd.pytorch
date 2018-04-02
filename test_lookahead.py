@@ -60,11 +60,12 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
     num_images = len(testset)
     for i in range(num_images):
         print('Testing image {:d}/{:d}....'.format(i+1, num_images))
-        # img = testset.pull_image(i)
-        # img_id, img, annotation = testset.pull_image_anno(i)
         img_id, img = testset.pull_image(i)
-        # img_id, annotation = testset.pull_anno(i)
-        x = torch.from_numpy(transform(img)[0]).permute(2, 0, 1)
+        x = transform(img)[0]
+
+        # this line makes a huge difference for some reason
+        x = x[:, :, ::-1].copy()
+        x = torch.from_numpy(x).permute(2, 0, 1)
         x = Variable(x.unsqueeze(0))
 
         if cuda:
@@ -125,8 +126,6 @@ if __name__ == '__main__':
     network_name = '300'
 
     net = build__lookahead_ssd('test', configs, network_name, num_classes, square_boxes=args.square_boxes)
-    # net = build_ssd('test', 300, num_classes) # initialize SSD
-    # net.load_state_dict(torch.load(args.trained_model))
     net.load_weights(args.trained_model)
 
     net.eval()  # required for dropout or batchnorm layers (not using any)
@@ -138,11 +137,7 @@ if __name__ == '__main__':
         test_image_ids = [im_id.rstrip() for im_id in test_image_ids]
 
     # use unannotated images instead
-    # test_image_ids = [str(i).zfill(5) for i in range(800, 1805)]
-    test_image_ids = [str(i).zfill(5) for i in range(832, 833)]
-
-
-    # test_image_ids = ['00700', '00701']
+    test_image_ids = [str(i).zfill(5) for i in range(800, 1805)]
 
     test_set = BhjcBballDataset(
         args.anno_dir, args.img_dir, test_image_ids, None,
