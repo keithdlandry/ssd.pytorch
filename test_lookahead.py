@@ -11,7 +11,7 @@ from PIL import Image
 from data import BaseTransform
 from data.bhjc20180123_bball.bhjc import BhjcBballDataset, AnnotationTransformBhjc
 import torch.utils.data as data
-from ssd import build_ssd
+from lookahead_ssd import build__lookahead_ssd
 from master_config import configs
 import json
 
@@ -124,7 +124,7 @@ if __name__ == '__main__':
     num_classes = len(class_dict) + 1
     network_name = '300'
 
-    net = build_ssd('test', configs, network_name, num_classes, square_boxes=args.square_boxes)
+    net = build__lookahead_ssd('test', configs, network_name, num_classes, square_boxes=args.square_boxes)
     # net = build_ssd('test', 300, num_classes) # initialize SSD
     # net.load_state_dict(torch.load(args.trained_model))
     net.load_weights(args.trained_model)
