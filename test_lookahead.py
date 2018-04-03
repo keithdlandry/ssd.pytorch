@@ -86,9 +86,9 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
             while detections[0, k, j, 0] >= args.visual_threshold:
 
                 score = detections[0, k, j, 0]
-                print(score)
                 label_name = labelmap[k-1]
                 pt = (detections[0, k, j, 1:]*scale).cpu().numpy()
+                print(score, pt)
                 # convert to width and height as is the COCO standard
                 pt[2] = pt[2] - pt[0]
                 pt[3] = pt[3] - pt[1]
