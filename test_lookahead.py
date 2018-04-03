@@ -131,6 +131,7 @@ if __name__ == '__main__':
     print('Finished loading model!')
 
     # load data
+    print(args.id_start, args.id_end)
     if args.id_start is not None and args.id_end is not None:
         test_image_ids = [str(i).zfill(args.id_zeropadding)
                           for i in range(args.id_start, args.id_end + 1)]
@@ -140,7 +141,7 @@ if __name__ == '__main__':
             test_image_ids = [im_id.rstrip() for im_id in test_image_ids]
 
     print(test_image_ids)
-    
+
     test_set = BhjcBballDataset(
         args.anno_dir, args.img_dir, test_image_ids, None,
         AnnotationTransformBhjc(ball_only=args.ball_only, class_to_ind=class_dict),
