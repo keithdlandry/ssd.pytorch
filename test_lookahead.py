@@ -27,7 +27,7 @@ parser.add_argument('--trained_model', default='weights/lookahead_ssd1166_300_it
                     type=str, help='Trained state_dict file path to open')
 parser.add_argument('--save_folder', default='eval/', type=str,
                     help='Dir to save results')
-parser.add_argument('--visual_threshold', default=0.15, type=float,
+parser.add_argument('--visual_threshold', default=0, type=float,
                     help='Final confidence threshold')
 parser.add_argument('--cuda', default=False, type=bool,
                     help='Use cuda to train model')
@@ -37,7 +37,7 @@ parser.add_argument('--ball_only', default=True, type=str2bool)
 parser.add_argument('--square_boxes', default=True, type=str2bool)
 parser.add_argument('--anno_dir', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/annotations/')
 parser.add_argument('--img_dir', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/images/')
-parser.add_argument('--outname', default='bbox_predictions_lookahead300_unannotated_thresh.15.json')
+parser.add_argument('--outname', default='bbox_predictions_lookahead300_unannotated_thresh.0.json')
 
 args = parser.parse_args()
 
@@ -137,7 +137,7 @@ if __name__ == '__main__':
         test_image_ids = [im_id.rstrip() for im_id in test_image_ids]
 
     # use unannotated images instead
-    test_image_ids = [str(i).zfill(5) for i in range(800, 1805)]
+    # test_image_ids = [str(i).zfill(5) for i in range(800, 1805)]
 
     test_set = BhjcBballDataset(
         args.anno_dir, args.img_dir, test_image_ids, None,
