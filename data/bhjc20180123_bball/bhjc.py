@@ -102,7 +102,8 @@ class BhjcBballDataset(data.Dataset):
             (default: 'bhjc')
     """
     def __init__(self, img_path, anno_path, id_list, transform=None,
-                 target_transform=None, dataset_name='bhjc', file_name_prfx='left_scene2_rot180_'):
+                 target_transform=None, dataset_name='bhjc', file_name_prfx='left_scene2_rot180_',
+                 file_type='.png'):
         self.img_path = img_path
         self.anna_path = anno_path
         self.transform = transform
@@ -112,6 +113,7 @@ class BhjcBballDataset(data.Dataset):
         self._imgpath = img_path
         self.ids = id_list
         self.file_name_prfx = file_name_prfx
+        self.file_type = file_type
 
     def __getitem__(self, index):
         im, gt, h, w = self.pull_item(index)
@@ -124,7 +126,7 @@ class BhjcBballDataset(data.Dataset):
                              s3_path='internal-experiments/basketball/bhjc/20180123/',
                              image_only=False):
 
-        im_path = s3_path + 'images/left_cam/' + self.file_name_prfx + img_id + '.png'
+        im_path = s3_path + 'images/left_cam/' + self.file_name_prfx + img_id + self.file_type
         anno_path = s3_path + 'labels/' + self.file_name_prfx + img_id + '.xml'  # xml file has no left_cam directory
 
         print('loading:', im_path)

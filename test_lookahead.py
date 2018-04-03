@@ -38,6 +38,11 @@ parser.add_argument('--square_boxes', default=True, type=str2bool)
 parser.add_argument('--anno_dir', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/annotations/')
 parser.add_argument('--img_dir', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/images/')
 parser.add_argument('--outname', default='bbox_predictions_lookahead300_99K_testonly_thresh.0.json')
+parser.add_argument('--id_start', default=None)
+parser.add_argument('--id_end', default=None)
+parser.add_argument('--file_prefix', default='left_scene2_rot180_')
+parser.add_argument('--id_zeropadding', default=5, type=int)
+parser.add_argument('--file_type', default='.png')
 
 args = parser.parse_args()
 
@@ -56,7 +61,6 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
 
     # dump predictions and assoc. ground truth to text file for now
     filename = save_folder + args.outname
-    # filename = save_folder+'bbox_predictions_{}_76k_unannot_thresh.2.json'.format(net_name)
     num_images = len(testset)
     for i in range(num_images):
         print('Testing image {:d}/{:d}....'.format(i+1, num_images))
@@ -119,7 +123,8 @@ if __name__ == '__main__':
     num_classes = len(class_dict) + 1
     network_name = '300'
 
-    net = build__lookahead_ssd('test', configs, network_name, num_classes, square_boxes=args.square_boxes)
+    net = build__lookahead_ssd('test', configs, network_name, num_classes,
+                               square_boxes=args.square_boxes)
     net.load_weights(args.trained_model)
 
     net.eval()  # required for dropout or batchnorm layers (not using any)
@@ -131,11 +136,14 @@ if __name__ == '__main__':
         test_image_ids = [im_id.rstrip() for im_id in test_image_ids]
 
     # use unannotated images instead
-    # test_image_ids = [str(i).zfill(5) for i in range(800, 1805)]
+    if args.id_start is not None and args.id_end is not None:
+        test_image_ids = [str(i).zfill(args.id_zeropadding)
+                          for i in range(args.id_start, args.id_end + 1)]
 
     test_set = BhjcBballDataset(
         args.anno_dir, args.img_dir, test_image_ids, None,
-        AnnotationTransformBhjc(ball_only=args.ball_only, class_to_ind=class_dict))
+        AnnotationTransformBhjc(ball_only=args.ball_only, class_to_ind=class_dict),
+        file_name_prfx=args.file_prefix)
 
     if args.cuda:
         net = net.cuda()
