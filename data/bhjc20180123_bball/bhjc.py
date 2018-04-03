@@ -115,6 +115,10 @@ class BhjcBballDataset(data.Dataset):
         self.file_name_prfx = file_name_prfx
         self.file_type = file_type
 
+        print('     image path:', self._imgpath)
+        print('annotation path:', self._annopath)
+
+
     def __getitem__(self, index):
         im, gt, h, w = self.pull_item(index)
         return im, gt
@@ -230,7 +234,7 @@ class BhjcBballDataset(data.Dataset):
         img_id = self.ids[index]
         # img = self.get_img_targ_from_s3(img_id, image_only=True)
         img_file = self._imgpath + self.file_name_prfx + img_id + self.file_type
-        print(self._imgpath, self.img_path, self._annopath)
+        print(img_file)
         img = cv2.imread(img_file)
 
         return img_id, img
