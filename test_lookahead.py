@@ -105,7 +105,6 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
                 if j == detections.shape[2]:
                     break
 
-    print(json.dumps(predictions))
     with open(filename, 'w') as outfile:
         json.dump(predictions, outfile)
 

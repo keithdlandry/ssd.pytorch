@@ -55,7 +55,7 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
     predictions = []
 
     # dump predictions and assoc. ground truth to text file for now
-    filename = save_folder+'bbox_predictions_{}_76k_unannot_thresh.2.json'.format(net_name)
+    filename = save_folder + args.outname
     num_images = len(testset)
     for i in range(num_images):
         print('Testing image {:d}/{:d}....'.format(i+1, num_images))
@@ -108,7 +108,6 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
                 if j == detections.shape[2]:
                     break
 
-    print(json.dumps(predictions))
     with open(filename, 'w') as outfile:
         json.dump(predictions, outfile)
 
