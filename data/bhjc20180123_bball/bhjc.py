@@ -157,7 +157,7 @@ class BhjcBballDataset(data.Dataset):
         img_id = self.ids[index]
 
         anno_file = self._annopath + self.file_name_prfx + img_id + '.xml'
-        img_file = self._imgpath + self.file_name_prfx + img_id + '.png'
+        img_file = self._imgpath + self.file_name_prfx + img_id + self.file_type
 
         print(anno_file)
         print(img_file)
@@ -228,7 +228,9 @@ class BhjcBballDataset(data.Dataset):
             PIL img
         '''
         img_id = self.ids[index]
-        img = self.get_img_targ_from_s3(img_id, image_only=True)
+        # img = self.get_img_targ_from_s3(img_id, image_only=True)
+        img_file = self._imgpath + self.file_name_prfx + img_id + self.file_type
+        img = cv2.imread(img_file)
 
         return img_id, img
 
