@@ -23,7 +23,7 @@ def str2bool(v):
 parser = argparse.ArgumentParser(description='Single Shot MultiBox Detection')
 # parser.add_argument('--trained_model', default='weights/ssd1166_bhjctrained_iter104000_ballonlysquare.pth',
 #                     type=str, help='Trained state_dict file path to open')
-parser.add_argument('--trained_model', default='weights/lookahead_ssd1166_300_iter89000.pth',
+parser.add_argument('--trained_model', default='weights/lookahead_ssd1166_300_iter76000.pth',
                     type=str, help='Trained state_dict file path to open')
 parser.add_argument('--save_folder', default='eval/', type=str,
                     help='Dir to save results')
@@ -37,7 +37,7 @@ parser.add_argument('--ball_only', default=True, type=str2bool)
 parser.add_argument('--square_boxes', default=True, type=str2bool)
 parser.add_argument('--anno_dir', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/annotations/')
 parser.add_argument('--img_dir', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/images/')
-parser.add_argument('--outname', default='bbox_predictions_lookahead300_unannotated_thresh.0.json')
+parser.add_argument('--outname', default='bbox_predictions_lookahead300_76K_testonly_thresh.0.json')
 
 args = parser.parse_args()
 
