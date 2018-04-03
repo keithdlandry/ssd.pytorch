@@ -107,7 +107,8 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
                 #     f.write(str(pred_num)+' label: '+label_name+' score: ' +
                 #             str(score) + ' '+' || '.join(str(c) for c in coords) + '\n')
                 j += 1
-                if j == len(detections.shape[2]):
+                print(detections.shape)
+                if j == detections.shape[2]:
                     break
 
     print(json.dumps(predictions))
