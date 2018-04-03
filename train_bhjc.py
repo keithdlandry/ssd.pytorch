@@ -70,8 +70,6 @@ if args.cuda and torch.cuda.is_available():
 else:
     torch.set_default_tensor_type('torch.FloatTensor')
 
-# cfg = (v1, v2)[args.version == 'v2']
-# cfg = bhjc_trunc_cfg
 
 if not os.path.exists(args.save_folder):
     os.mkdir(args.save_folder)
@@ -107,8 +105,8 @@ if args.visdom:
 
 ssd_net = build_ssd('train', configs, network_name, num_classes, args.square_boxes)  # use the configuration for the SSD300 network
 
-
 net = ssd_net
+
 
 def xavier(param):
     init.xavier_uniform(param)
@@ -118,6 +116,7 @@ def weights_init(m):
     if isinstance(m, nn.Conv2d):
         xavier(m.weight.data)
         m.bias.data.zero_()
+
 
 if args.cuda:
     net = torch.nn.DataParallel(ssd_net)  # this fixed something
@@ -162,12 +161,6 @@ def train():
     with open(id_file) as f:
         train_image_ids = f.readlines()
     train_image_ids = [im_id.rstrip() for im_id in train_image_ids]
-
-    # train_image_ids = ['00700']
-    # train_image_ids = ['00196']
-    # train_image_ids = ['00198', '00091']
-    # print(train_image_ids)
-    # return 0
 
     dataset = BhjcBballDataset(args.img_dir, args.anno_dir, train_image_ids,
                                SSDAugmentation(ssd_dim, means),
