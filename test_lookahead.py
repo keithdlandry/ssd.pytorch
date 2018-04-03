@@ -81,13 +81,14 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
         scale = torch.Tensor([img.shape[1], img.shape[0],
                              img.shape[1], img.shape[0]])
 
-        for i in range(detections.size(1)):
+        for k in range(detections.size(1)):
             j = 0
-            while detections[0, i, j, 0] >= args.visual_threshold:
+            while detections[0, k, j, 0] >= args.visual_threshold:
 
-                score = detections[0, i, j, 0]
-                label_name = labelmap[i-1]
-                pt = (detections[0, i, j, 1:]*scale).cpu().numpy()
+                score = detections[0, k, j, 0]
+                print(score)
+                label_name = labelmap[k-1]
+                pt = (detections[0, k, j, 1:]*scale).cpu().numpy()
                 # convert to width and height as is the COCO standard
                 pt[2] = pt[2] - pt[0]
                 pt[3] = pt[3] - pt[1]
@@ -131,7 +132,6 @@ if __name__ == '__main__':
     print('Finished loading model!')
 
     # load data
-    print(type(args.id_start), type(args.id_end), type(args.id_zeropadding))
     if args.id_start is not None and args.id_end is not None:
         test_image_ids = [str(i).zfill(args.id_zeropadding) for
                           i in range(args.id_start, args.id_end + 1)]
@@ -139,8 +139,6 @@ if __name__ == '__main__':
         with open(args.id_file) as f:
             test_image_ids = f.readlines()
             test_image_ids = [im_id.rstrip() for im_id in test_image_ids]
-
-    print(test_image_ids)
 
     # test_set = BhjcBballDataset(
     #     args.anno_dir, args.img_dir, test_image_ids, None,
