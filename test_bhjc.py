@@ -104,12 +104,9 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
                                     'score': score
                                     })
 
-                # coords = (pt[0], pt[1], pt[2], pt[3])
-                # pred_num += 1
-                # with open(filename, mode='a') as f:
-                #     f.write(str(pred_num)+' label: '+label_name+' score: ' +
-                #             str(score) + ' '+' || '.join(str(c) for c in coords) + '\n')
                 j += 1
+                if j == detections.shape[2]:
+                    break
 
     print(json.dumps(predictions))
     with open(filename, 'w') as outfile:
