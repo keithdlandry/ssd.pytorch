@@ -62,10 +62,11 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
         # img = testset.pull_image(i)
         # img_id, img, annotation = testset.pull_image_anno(i)
         img_id, img = testset.pull_image(i)
+        x = transform(img)[0]
 
         # this .copy line makes a huge difference (at least on lookahead architecture)
         x = x[:, :, ::-1].copy()
-        x = torch.from_numpy(transform(img)[0]).permute(2, 0, 1)
+        x = torch.from_numpy(x).permute(2, 0, 1)
         x = Variable(x.unsqueeze(0))
 
         if cuda:
