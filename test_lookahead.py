@@ -80,9 +80,7 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
         for i in range(detections.size(1)):
             j = 0
             while detections[0, i, j, 0] >= args.visual_threshold:
-                # if pred_num == 0:
-                #     with open(filename, mode='a') as f:
-                #         f.write('PREDICTIONS: '+'\n')
+
                 score = detections[0, i, j, 0]
                 label_name = labelmap[i-1]
                 pt = (detections[0, i, j, 1:]*scale).cpu().numpy()
@@ -109,6 +107,8 @@ def test_net(save_folder, net, cuda, testset, transform, net_name):
                 #     f.write(str(pred_num)+' label: '+label_name+' score: ' +
                 #             str(score) + ' '+' || '.join(str(c) for c in coords) + '\n')
                 j += 1
+                if j == len(detections.shape[2]):
+                    break
 
     print(json.dumps(predictions))
     with open(filename, 'w') as outfile:
