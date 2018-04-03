@@ -150,7 +150,7 @@ if __name__ == '__main__':
     test_set = BhjcBballDataset(
         args.img_dir, args.anno_dir, test_image_ids, None,
         AnnotationTransformBhjc(ball_only=args.ball_only, class_to_ind=class_dict),
-        file_name_prfx=args.file_prefix)
+        file_name_prfx=args.file_prefix, file_type=args.file_type)
 
     if args.cuda:
         net = net.cuda()
