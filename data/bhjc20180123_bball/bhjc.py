@@ -230,6 +230,7 @@ class BhjcBballDataset(data.Dataset):
         img_id = self.ids[index]
         # img = self.get_img_targ_from_s3(img_id, image_only=True)
         img_file = self._imgpath + self.file_name_prfx + img_id + self.file_type
+        print(img_file)
         img = cv2.imread(img_file)
 
         return img_id, img
