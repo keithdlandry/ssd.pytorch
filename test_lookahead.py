@@ -40,9 +40,9 @@ parser.add_argument('--img_dir', default='/home/ec2-user/computer_vision/bball_d
 parser.add_argument('--outname', default='bbox_predictions_lookahead300_99K_testonly_thresh.0.json')
 parser.add_argument('--id_start', default=None)
 parser.add_argument('--id_end', default=None)
-parser.add_argument('--file_prefix', default='left_scene2_rot180_')
+parser.add_argument('--file_prefix', default='left_scene2_rot180_', type=str)
 parser.add_argument('--id_zeropadding', default=5, type=int)
-parser.add_argument('--file_type', default='.png')
+parser.add_argument('--file_type', default='.png', type=str)
 
 args = parser.parse_args()
 
@@ -131,15 +131,16 @@ if __name__ == '__main__':
     print('Finished loading model!')
 
     # load data
-    with open(args.id_file) as f:
-        test_image_ids = f.readlines()
-        test_image_ids = [im_id.rstrip() for im_id in test_image_ids]
-
-    # use unannotated images instead
     if args.id_start is not None and args.id_end is not None:
         test_image_ids = [str(i).zfill(args.id_zeropadding)
                           for i in range(args.id_start, args.id_end + 1)]
+    else:
+        with open(args.id_file) as f:
+            test_image_ids = f.readlines()
+            test_image_ids = [im_id.rstrip() for im_id in test_image_ids]
 
+    print(test_image_ids)
+    
     test_set = BhjcBballDataset(
         args.anno_dir, args.img_dir, test_image_ids, None,
         AnnotationTransformBhjc(ball_only=args.ball_only, class_to_ind=class_dict),
