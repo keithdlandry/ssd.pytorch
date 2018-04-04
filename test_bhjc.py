@@ -141,7 +141,7 @@ if __name__ == '__main__':
     # test_image_ids = ['00700', '00701']
 
     test_set = BhjcBballDataset(
-        args.anno_dir, args.img_dir, test_image_ids, None,
+        args.img_dir, args.anno_dir, test_image_ids, None,
         AnnotationTransformBhjc(ball_only=args.ball_only, class_to_ind=class_dict))
 
     if args.cuda:
