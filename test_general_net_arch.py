@@ -40,7 +40,7 @@ parser.add_argument('--file_prefix', default='left_scene2_rot180_', type=str)
 parser.add_argument('--id_zeropadding', default=5, type=int)
 parser.add_argument('--file_type', default='.png', type=str)
 parser.add_argument('--lookahead', default=False, type=str2bool)
-parser.add_argument('--net_name', default='300', type=str2bool)
+parser.add_argument('--net_name', default='300', type=str)
 args = parser.parse_args()
 
 if not os.path.exists(args.save_folder):
@@ -120,6 +120,9 @@ if __name__ == '__main__':
 
     num_classes = len(class_dict) + 1
     network_name = args.net_name
+
+    print('using network:', network_name)
+    print('    lookahead:', args.lookahead)
 
     if args.lookahead:
         if network_name == 'trunc':
