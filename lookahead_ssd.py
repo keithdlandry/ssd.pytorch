@@ -219,7 +219,7 @@ def multibox(vgg, extra_layers, cfg, num_classes, vgg_source=[21, -2]):
     return vgg, extra_layers, (loc_layers, conf_layers)
 
 
-def build__lookahead_ssd(phase, configs, network_name='300', num_classes=21, square_boxes=False):
+def build_lookahead_ssd(phase, configs, network_name='300', num_classes=21, square_boxes=False):
     if phase != "test" and phase != "train":
         print("Error: Phase not recognized")
         return
