@@ -14,6 +14,7 @@ import torch.utils.data as data
 from ssd import build_ssd
 from master_config import configs
 import json
+import time
 
 
 def str2bool(v):
@@ -37,7 +38,8 @@ parser.add_argument('--ball_only', default=True, type=str2bool)
 parser.add_argument('--square_boxes', default=True, type=str2bool)
 parser.add_argument('--anno_dir', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/annotations/')
 parser.add_argument('--img_dir', default='/home/ec2-user/computer_vision/bball_detection/ssd.pytorch/data/bhjc20180123_bball/images/')
-parser.add_argument('--outname', default='bbox_predictions_ssd300_76K_unanno_thresh.0.json')
+parser.add_argument('--outname', default='timing_test.0.json')
+parser.add_argument('--network_name', default='300', type=str)
 
 args = parser.parse_args()
 
@@ -120,11 +122,9 @@ if __name__ == '__main__':
         class_dict = configs['classes']['all_class']
 
     num_classes = len(class_dict) + 1
-    network_name = '300'
+    network_name = args.network_name
 
     net = build_ssd('test', configs, network_name, num_classes, square_boxes=args.square_boxes)
-    # net = build_ssd('test', 300, num_classes) # initialize SSD
-    # net.load_state_dict(torch.load(args.trained_model))
     net.load_weights(args.trained_model)
 
     net.eval()  # required for dropout or batchnorm layers (not using any)
@@ -149,5 +149,7 @@ if __name__ == '__main__':
         cudnn.benchmark = True
 
     # evaluation
+    start = time.time()
     test_net(args.save_folder, net, args.cuda, test_set,
              BaseTransform(net.size, (104, 117, 123)), net_name=network_name)
+    print('completed in', time.time() - start)
