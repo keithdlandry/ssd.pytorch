@@ -136,7 +136,7 @@ if __name__ == '__main__':
         test_image_ids = [im_id.rstrip() for im_id in test_image_ids]
 
     # use unannotated images instead
-    test_image_ids = [str(i).zfill(5) for i in range(800, 1805)]
+    # test_image_ids = [str(i).zfill(5) for i in range(800, 1805)]
 
     # test_image_ids = ['00700', '00701']
 
