@@ -75,7 +75,10 @@ if not os.path.exists(args.save_folder):
     os.mkdir(args.save_folder)
 
 network_name = args.network_name
-ssd_dim = 1166  # dimension of small side of image
+ssd_dim = 1166  # dimension of small side of image (only used to resize image)
+if network_name == 'small583':
+    ssd_dim = 583
+
 means = (104, 117, 123)  # only support voc now
 # means = (103, 100, 94)  # RGB mean values for bhjc 700 image set
 std_devs = (71.1, 69.2, 67.3)
@@ -104,7 +107,6 @@ if args.visdom:
     viz = visdom.Visdom()
 
 ssd_net = build_ssd('train', configs, network_name, num_classes, args.square_boxes)  # use the configuration for the SSD300 network
-
 net = ssd_net
 
 
@@ -141,7 +143,6 @@ if not args.resume:
     ssd_net.extras.apply(weights_init)
     ssd_net.loc.apply(weights_init)
     ssd_net.conf.apply(weights_init)
-
 
 optimizer = optim.SGD(net.parameters(), lr=args.lr,
                       momentum=args.momentum, weight_decay=args.weight_decay)
