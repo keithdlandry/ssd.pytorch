@@ -97,6 +97,8 @@ class SSD(nn.Module):
             # print('after confidence layer:', c(x).shape)
             # print('loc0 ----- ', type(loc[0]))
 
+        # use this to determine the fmap sized for bouding boxes
+        # print('kkkkkk', loc[5].shape)
         loc = torch.cat([o.view(o.size(0), -1) for o in loc], 1)
         # print('-----loc', loc.shape)
         conf = torch.cat([o.view(o.size(0), -1) for o in conf], 1)

@@ -120,6 +120,7 @@ if __name__ == '__main__':
 
     num_classes = len(class_dict) + 1
     network_name = args.net_name
+    print(network_name)
 
     print('using network:', network_name)
     print('    lookahead:', args.lookahead)

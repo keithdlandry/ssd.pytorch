@@ -74,7 +74,7 @@ configs = {
         'vgg_source': [21, -2],
         'final_base_layer_dim': 1024,
         'box_configs': {
-            'feature_maps': [73, 37, 19, 10, 8, 6],
+            'feature_maps': [73, 36, 18, 9, 7, 5],
             'min_dim': 1166,
             'steps': [8, 16, 32, 64, 69, 78],  # default for 1166
             'min_sizes': [30, 60, 111, 162, 213, 264],  # default for 300
