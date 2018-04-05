@@ -172,7 +172,6 @@ class BhjcBballDataset(data.Dataset):
         # img, target = self.get_img_targ_from_s3(img_id)
 
         height, width, channels = img.shape
-        print(height, width)
 
         if self.target_transform is not None:
             target = self.target_transform(target, width, height)
@@ -180,6 +179,7 @@ class BhjcBballDataset(data.Dataset):
         if self.transform is not None:
             target = np.array(target)
             img, boxes, labels = self.transform(img, target[:, :4], target[:, 4])
+            print(img.size)
             # to rgb
             img = img[:, :, (2, 1, 0)]
             # img = img.transpose(2, 0, 1)
