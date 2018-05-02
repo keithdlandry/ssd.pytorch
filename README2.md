@@ -115,4 +115,4 @@ dataset since the same image can be used multiple times with different transform
 
 ## Example
 
-![alt text](https://gitlab.betgenius.net/computer_vision/basketball_detection/blob/ball-only/data/output_imgs/unannot/lookahead1166_300_vanilla_thresh.3/leftcam_detect_unannot_00803.png "detection example")
+[See example image here](https://gitlab.betgenius.net/computer_vision/basketball_detection/blob/ball-only/data/output_imgs/unannot/lookahead1166_300_vanilla_thresh.3/leftcam_detect_unannot_00803.png "detection example")
