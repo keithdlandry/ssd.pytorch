@@ -35,9 +35,9 @@ parser.add_argument('--img_dir', default='/home/ec2-user/computer_vision/bball_d
                                          'ssd.pytorch/data/bhjc20180123_bball/images/')
 parser.add_argument('--outname', default='bbox_predictions_lookahead300_99K_testonly_thresh.0.json')
 parser.add_argument('--id_start', default=None, type=int)
-parser.add_argument('--id_end', default=None, type=int)
+parser.add_argument('--id_end', default=None, type=int, help='inclusive')
 parser.add_argument('--file_prefix', default='left_scene2_rot180_', type=str)
-parser.add_argument('--id_zeropadding', default=5, type=int)
+parser.add_argument('--id_zeropadding', default=5, type=int, help='how many digits the frame numbers are')
 parser.add_argument('--file_type', default='.png', type=str)
 parser.add_argument('--lookahead', default=False, type=str2bool)
 parser.add_argument('--net_name', default='300', type=str)
@@ -157,4 +157,5 @@ if __name__ == '__main__':
         cudnn.benchmark = True
 
     # evaluation
+    # image resize is included in BaseTransform
     test_net(args.save_folder, net, args.cuda, test_set, BaseTransform(net.size, (104, 117, 123)))

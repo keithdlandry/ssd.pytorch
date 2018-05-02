@@ -79,7 +79,7 @@ ssd_dim = 1166  # dimension of small side of image (only used to resize image)
 if network_name == 'small583':
     ssd_dim = 583
 
-means = (104, 117, 123)  # only support voc now
+means = (104, 117, 123)  # only support voc now (use this one)
 # means = (103, 100, 94)  # RGB mean values for bhjc 700 image set
 std_devs = (71.1, 69.2, 67.3)
 
@@ -95,12 +95,9 @@ num_classes = len(class_dict) + 1
 batch_size = args.batch_size
 accum_batch_size = 32
 iter_size = accum_batch_size / batch_size
-max_iter = 120000
 max_iter = args.iterations
 weight_decay = 0.0005
-stepvalues = (80000, 100000, 120000)
-gamma = 0.1
-momentum = 0.9
+stepvalues = (80000, 100000, 120000)  # to adjust learning rate
 
 if args.visdom:
     import visdom

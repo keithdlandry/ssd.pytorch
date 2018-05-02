@@ -118,7 +118,6 @@ class BhjcBballDataset(data.Dataset):
         print('     image path:', self._imgpath)
         print('annotation path:', self._annopath)
 
-
     def __getitem__(self, index):
         im, gt, h, w = self.pull_item(index)
         return im, gt

@@ -11,7 +11,7 @@ from data import v2, v1, detection_collate
 from data.bhjc20180123_bball.bhjc import BhjcBballDataset, AnnotationTransformBhjc
 from utils.augmentations import SSDAugmentation
 from layers.modules import MultiBoxLoss
-from lookahead_ssd import build__lookahead_ssd
+from lookahead_ssd import build_lookahead_ssd
 import numpy as np
 import time
 import datetime
@@ -101,7 +101,7 @@ if args.visdom:
     import visdom
     viz = visdom.Visdom()
 
-ssd_net = build__lookahead_ssd('train', configs, network_name, num_classes, args.square_boxes)  # use the configuration for the SSD300 network
+ssd_net = build_lookahead_ssd('train', configs, network_name, num_classes, args.square_boxes)  # use the configuration for the SSD300 network
 
 net = ssd_net
 
