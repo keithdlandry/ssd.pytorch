@@ -190,6 +190,7 @@ def multibox(vgg, extra_layers, cfg, num_classes, vgg_source=[21, -2]):
                                  cfg[k] * 4, kernel_size=3, padding=1, stride=1)]  # changed from s1 to s2 when using half number of prior boxes
         conf_layers += [nn.Conv2d(vgg[v].out_channels,
                         cfg[k] * num_classes, kernel_size=3, padding=1, stride=1)]  # changed from s1 to s2...
+
     for k, v in enumerate(extra_layers[1::2], 2):
         loc_layers += [nn.Conv2d(v.out_channels, cfg[k]
                                  * 4, kernel_size=3, padding=1, stride=1)]  # changed from s1 to s2...

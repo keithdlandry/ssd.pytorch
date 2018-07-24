@@ -91,7 +91,7 @@ else:
 if args.square_boxes:
     configs[network_name]['box_configs']['square_only'] = True
 
-num_classes = len(class_dict) + 1
+num_classes = len(class_dict) + 1  # at 1 for background
 batch_size = args.batch_size
 accum_batch_size = 32
 iter_size = accum_batch_size / batch_size

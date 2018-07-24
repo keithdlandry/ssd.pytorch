@@ -82,9 +82,10 @@ class MultiBoxLoss(nn.Module):
         conf_t = Variable(conf_t, requires_grad=False)
 
         pos = conf_t > 0
-        num_pos = pos.sum(dim=1, keepdim=True)
+        # num_pos = pos.sum(dim=1, keepdim=True)
         # print('num positive classes', num_pos)
         # print(pos)
+
         # Localization Loss (Smooth L1)
         # Shape: [batch,num_priors,4]
         pos_idx = pos.unsqueeze(pos.dim()).expand_as(loc_data)
@@ -106,7 +107,7 @@ class MultiBoxLoss(nn.Module):
         num_neg = torch.clamp(self.negpos_ratio*num_pos, max=pos.size(1)-1)
         neg = idx_rank < num_neg.expand_as(idx_rank)
 
-        # Confidence Loss Including Positive and Negative Examples
+        # Confidence Loss Including Positive and Negative Examples (gt is greater than)
         pos_idx = pos.unsqueeze(2).expand_as(conf_data)
         neg_idx = neg.unsqueeze(2).expand_as(conf_data)
         conf_p = conf_data[(pos_idx+neg_idx).gt(0)].view(-1, self.num_classes)
